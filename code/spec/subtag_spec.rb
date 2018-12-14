@@ -19,6 +19,10 @@ describe Registry do
     it "returns subtags" do
       expect(Registry.parse.subtags.map(&:class).uniq).to eq [Subtag]
     end
+
+    it "returns 9070 subtags" do
+      expect(Registry.parse.subtags.count).to eq 9070
+    end
   end
 
   describe '#add_subtag' do
@@ -94,6 +98,14 @@ describe Subtag do
       expect do
         subtag = Subtag.new(code: "hrz", descriptions: "Harzani")
       end.not_to raise_exception
+    end
+  end
+
+  describe '#add_description' do
+    it "adds a description" do
+      expect do
+        subtag.add_description "Afar"
+      end.to change(subtag.descriptions, :count).by(1)
     end
   end
 end
