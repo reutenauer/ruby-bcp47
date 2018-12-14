@@ -12,12 +12,9 @@ class Registry
     subtag = Subtag.new
     File.read(File.expand_path('../../language-subtag-registry', __dir__)).each_line do |line|
       if line =~ /^File-Date: (.*)$/
-        puts 1
         registry.file_date = Date.parse($1)
       elsif line =~ /%%/
-        puts 2
         registry.add_subtag subtag
-        puts registry.subtags.count
         subtag = Subtag.new
       end
     end
@@ -31,12 +28,14 @@ class Registry
 end
 
 class Subtag
+  attr_accessor :type, :code, :descriptions, :added, :suppress_script, :scope
+
   def initialize(params = { })
     @code = params[:code]
     @type = params[:type]
     @scope = params[:scope]
     @added = params[:added]
     @suppress_script = params[:suppress_script]
-    @descriptions = params[:descrptions]
+    @descriptions = params[:descriptions]
   end
 end

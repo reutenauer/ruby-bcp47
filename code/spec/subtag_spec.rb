@@ -40,12 +40,50 @@ describe Subtag do
     )
   end
 
-  it "has a type"
-  it "has a code"
-  it "has descriptions"
-  it "has an added date"
-  it "has a suppress-script"
-  it "has a scope"
+  let(:armenian_family) do
+    Subtag.new(
+      type: "language",
+      code: "hyx",
+      description: "Armenian (family)",
+      added: Date.new(2007, 7, 29),
+      scope: "collection",
+    )
+  end
+
+  let(:konkani) do
+    Subtag.new(
+      type: "language",
+      code: "kok",
+      description: "Konkani (macrolanguage)",
+      added: Date.new(2005, 10, 16),
+      suppress_script: "Deva",
+      scope: "macrolanguage",
+    )
+  end
+
+  it "has a type" do
+    expect(subtag.type).to eq 'language'
+  end
+
+  it "has a code" do
+    expect(subtag.code).to eq 'hrx'
+  end
+
+  it "has descriptions" do
+    expect(subtag.descriptions).to eq ['Hunsrik']
+  end
+
+  it "has an added date" do
+    expect(subtag.added).to eq Date.new(2009, 7, 29)
+  end
+
+  it "has a suppress-script" do
+    expect(konkani.suppress_script).to eq 'Deva'
+  end
+
+  it "has a scope" do
+    expect(armenian_family.scope).to eq 'collection'
+  end
 
   describe '.new' do
     it "returns a Subtag" do
