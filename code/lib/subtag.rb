@@ -2,38 +2,41 @@ require 'date'
 
 class Registry
   attr_accessor :file_date, :subtags
+  @@registry = nil
 
   def initialize
     @subtags = []
   end
 
   def self.parse
-    registry = new
-    subtag = Subtag.new
-    File.read(File.expand_path('../../language-subtag-registry', __dir__)).each_line do |line|
-      if line =~ /^File-Date: (.*)$/
-        registry.file_date = Date.parse($1)
-      elsif line.strip == '%%'
-        registry.add_subtag subtag
-        subtag = Subtag.new
-      elsif line =~ /^Type: (.*)$/
-        subtag.type = $1
-      elsif line =~ /^Subtag: (.*)$/
-        subtag.code = $1
-      elsif line =~ /^Description: (.*)$/
-        subtag.add_description $1
-      elsif line =~ /^Added: (.*)$/
-        subtag.added = Date.parse $1
-      elsif line =~ /^Suppress-Script: (.*)$/
-        subtag.suppress_script = $1
-      elsif line =~ /^Scope: (.*)$/
-        subtag.scope = $1
-      else
-        raise "Error: line type unknown: #{line}"
+    unless @@registry
+      registry = new
+      subtag = Subtag.new
+      File.read(File.expand_path('../../language-subtag-registry', __dir__)).each_line do |line|
+        if line =~ /^File-Date: (.*)$/
+          registry.file_date = Date.parse($1)
+        elsif line.strip == '%%'
+          registry.add_subtag subtag
+          subtag = Subtag.new
+        elsif line =~ /^Type: (.*)$/
+          subtag.type = $1
+        elsif line =~ /^Subtag: (.*)$/
+          subtag.code = $1
+        elsif line =~ /^Description: (.*)$/
+          subtag.add_description $1
+        elsif line =~ /^Added: (.*)$/
+          subtag.added = Date.parse $1
+        elsif line =~ /^Suppress-Script: (.*)$/
+          subtag.suppress_script = $1
+        elsif line =~ /^Scope: (.*)$/
+          subtag.scope = $1
+        else
+          raise "Error: line type unknown: #{line}"
+        end
       end
     end
 
-    registry
+    @@registry
   end
 
   def add_subtag(subtag)
