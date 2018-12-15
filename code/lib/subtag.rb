@@ -10,13 +10,13 @@ class Registry
 
   def self.parse
     unless @@registry
-      registry = new
+      @@registry = new
       subtag = Subtag.new
       File.read(File.expand_path('../../language-subtag-registry', __dir__)).each_line do |line|
         if line =~ /^File-Date: (.*)$/
-          registry.file_date = Date.parse($1)
+          @@registry.file_date = Date.parse($1)
         elsif line.strip == '%%'
-          registry.add_subtag subtag
+          @@registry.add_subtag subtag
           subtag = Subtag.new
         elsif line =~ /^Type: (.*)$/
           subtag.type = $1
