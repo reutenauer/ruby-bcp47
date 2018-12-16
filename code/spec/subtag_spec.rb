@@ -2,6 +2,14 @@ require 'spec_helper'
 
 describe Registry do
   let(:registry) { Registry.new }
+  let(:interlingua) do
+    <<-EOIA
+Type: language
+Subtag: ia
+Description: Interlingua (International Auxiliary Language
+  Association)
+  EOIA
+  end
 
   it "has a file date" do
     expect(Registry.parse.file_date).to eq Date.new(2018, 11, 30)
@@ -21,7 +29,14 @@ describe Registry do
     end
 
     it "returns 9070 subtags" do
-      expect(Registry.parse.subtags.count).to eq 9070
+      expect(Registry.parse.subtags.count).to eq 9071
+    end
+
+    it "wraps lines" do
+      allow(File).to receive(:read).and_return interlingua
+      Registry.class_variable_set :@@registry, nil # FIXME!!
+      registry = Registry.parse
+      expect(registry.subtags.first.descriptions.first).to eq 'Interlingua (International Auxiliary Language Association)'
     end
   end
 
@@ -65,6 +80,9 @@ describe Subtag do
     )
   end
 
+  let(:bosnian) { Subtag.new(code: 'bs', macrolanguage: 'sh') }
+  let(:western_armenian) { Subtag.new(code: 'hyw', comments: 'see also hy') }
+
   it "has a type" do
     expect(subtag.type).to eq 'language'
   end
@@ -89,6 +107,14 @@ describe Subtag do
     expect(armenian_family.scope).to eq 'collection'
   end
 
+  it "may have a macrolanguage" do
+    expect(bosnian.macrolanguage).to eq 'sh' # TODO Make it an actual subtag later
+  end
+
+  it "may have comments" do
+    expect(western_armenian.comments).to eq 'see also hy'
+  end
+
   describe '.new' do
     it "returns a Subtag" do
       expect(Subtag.new).to be_a Subtag
@@ -98,6 +124,12 @@ describe Subtag do
       expect do
         subtag = Subtag.new(code: "hrz", descriptions: "Harzani")
       end.not_to raise_exception
+    end
+
+    describe '#empty?' do
+      it "returns true if subtag is empty" do
+        expect(Subtag.new.empty?).to be_truthy
+      end
     end
   end
 
