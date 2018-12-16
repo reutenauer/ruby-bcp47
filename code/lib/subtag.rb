@@ -54,9 +54,12 @@ class Registry
         elsif line =~ /^Preferred-Value: (.*)$/
           flush_stack subtag, stack
           stack = { preferred_value: $1 }
-        elsif line == /^Tag: (.*)$/
+        elsif line =~ /^Tag: (.*)$/
           flush_stack subtag, stack
           stack = { tag: $1 }
+        elsif line =~ /^Prefix: (.*)$/
+          flush_stack subtag, stack
+          stack = { prefix: $1 }
         else
           # raise "Error: line type unknown: #{line}; subtag = #{subtag.code}" # FIXME temp
           # type = line.gsub(/^(.*?):.*/, $1).downcase
@@ -80,7 +83,7 @@ class Registry
   def self.flush_stack subtag, stack # TODO Spec out!
     return unless stack
 
-    [:type, :code, :added, :suppress_script, :scope, :macrolanguage, :comments, :deprecated, :preferred_value, :tag].each do |key|
+    [:type, :code, :added, :suppress_script, :scope, :macrolanguage, :comments, :deprecated, :preferred_value, :tag, :prefix].each do |key|
       subtag.send sprintf('%s=', key), stack.delete(key)
     end
     description = stack.delete(:description)
@@ -89,7 +92,7 @@ class Registry
 end
 
 class Subtag
-  attr_accessor :type, :code, :descriptions, :added, :suppress_script, :scope, :macrolanguage, :comments, :deprecated, :preferred_value, :tag
+  attr_accessor :type, :code, :descriptions, :added, :suppress_script, :scope, :macrolanguage, :comments, :deprecated, :preferred_value, :tag, :prefix
 
   def initialize(params = { })
     @code = params[:code]
@@ -103,6 +106,7 @@ class Subtag
     @deprecated = params[:deprecated]
     @preferred_value = params[:preferred_value]
     @tag = params[:tag]
+    @prefix = params[:prefix]
   end
 
   def add_description description
@@ -110,6 +114,6 @@ class Subtag
   end
 
   def empty?
-    !(@code || @type || @scope || @added || @suppress_script || @macrolanguage || @comments || @deprecated || @preferred_value || @tag) && (!@descriptions || @descriptions && @descriptions.count == 0)
+    !(@code || @type || @scope || @added || @suppress_script || @macrolanguage || @comments || @deprecated || @preferred_value || @tag || @prefix) && (!@descriptions || @descriptions && @descriptions.count == 0)
   end
 end
