@@ -54,7 +54,7 @@ class Registry
         elsif line =~ /^Preferred-Value: (.*)$/
           flush_stack subtag, stack
           stack = { preferred_value: $1 }
-        elsif line = /^Tag: (.*)$/
+        elsif line == /^Tag: (.*)$/
           flush_stack subtag, stack
           stack = { tag: $1 }
         else
