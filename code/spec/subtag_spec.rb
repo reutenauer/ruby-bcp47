@@ -32,6 +32,10 @@ Description: Interlingua (International Auxiliary Language
       expect(Registry.parse.subtags.count).to eq 9071
     end
 
+    it "returns actual subtags" do
+      expect(Registry.parse.subtags.select { |st| st.code == 'Hant' }).to eq ['Hant']
+    end
+
     it "wraps lines" do
       allow(File).to receive(:read).and_return interlingua
       Registry.class_variable_set :@@registry, nil # FIXME!!
