@@ -29,9 +29,7 @@ Description: Interlingua (International Auxiliary Language
     end
 
     it "returns 9070 subtags" do
-      registry = Registry.parse
-      # byebug
-      expect(registry.subtags.count).to eq 9070
+      expect(Registry.parse.subtags.count).to eq 9070
     end
 
     it "returns actual subtags" do

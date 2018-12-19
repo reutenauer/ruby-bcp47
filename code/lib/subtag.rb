@@ -19,11 +19,9 @@ class Registry
         if line =~ /^File-Date: (.*)$/ # TODO Use named parameters all around?
           @@registry.file_date = Date.parse($1)
         elsif line.strip == '%%' # TODO strip_right?
-          # byebug
           @@registry.add_subtag subtag unless subtag.empty?
           subtag = Subtag.new
         elsif line =~ /^  (.*)$/
-          # byebug
           stack[stack.keys.first] = sprintf('%s %s', stack.values.first.strip, $1)
         elsif line =~ /^Type: (.*)$/
           flush_stack subtag, stack
@@ -31,13 +29,8 @@ class Registry
         elsif line =~ /^Subtag: (.*)$/
           flush_stack subtag, stack
           stack = { code: $1 }
-          # puts stack
         elsif line =~ /^Description: (.*)$/
-          puts stack
-          puts subtag.code
-          puts subtag.code.object_id if subtag.code
           flush_stack subtag, stack
-          # byebug
           stack = { description: $1 }
         elsif line =~ /^Added: (.*)$/
           flush_stack subtag, stack
@@ -74,7 +67,6 @@ class Registry
       end
 
       raise "Missed types: #{@@missed_types.uniq}" if @@missed_types.count > 0
-      # byebug if @@registry.subtags.count == 9070
       flush_stack subtag, stack unless stack.empty?
       @@registry.add_subtag subtag unless subtag.empty?
     end
@@ -92,8 +84,6 @@ class Registry
     # puts stack[:code] if stack[:code]
     # [:type, :code, :added, :suppress_script, :scope, :macrolanguage, :comments, :deprecated, :preferred_value, :tag, :prefix].each do |key|
     stack.each do |key, value|
-      # byebug
-      # subtag.send sprintf('%s=', key), stack.delete(key)
       next if key == :description
       subtag.send sprintf('%s=', key), stack.delete(key)
       return if stack.empty?
