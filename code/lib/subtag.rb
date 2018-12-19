@@ -19,7 +19,8 @@ class Registry
         if line =~ /^File-Date: (.*)$/ # TODO Use named parameters all around?
           @@registry.file_date = Date.parse($1)
         elsif line.strip == '%%' # TODO strip_right?
-          @@registry.add_subtag subtag
+          # byebug
+          @@registry.add_subtag subtag unless subtag.empty?
           subtag = Subtag.new
         elsif line =~ /^  (.*)$/
           # byebug
@@ -30,8 +31,13 @@ class Registry
         elsif line =~ /^Subtag: (.*)$/
           flush_stack subtag, stack
           stack = { code: $1 }
+          # puts stack
         elsif line =~ /^Description: (.*)$/
+          puts stack
+          puts subtag.code
+          puts subtag.code.object_id if subtag.code
           flush_stack subtag, stack
+          # byebug
           stack = { description: $1 }
         elsif line =~ /^Added: (.*)$/
           flush_stack subtag, stack
@@ -83,8 +89,14 @@ class Registry
   def self.flush_stack subtag, stack # TODO Spec out!
     return unless stack
 
-    [:type, :code, :added, :suppress_script, :scope, :macrolanguage, :comments, :deprecated, :preferred_value, :tag, :prefix].each do |key|
+    # puts stack[:code] if stack[:code]
+    # [:type, :code, :added, :suppress_script, :scope, :macrolanguage, :comments, :deprecated, :preferred_value, :tag, :prefix].each do |key|
+    stack.each do |key, value|
+      # byebug
+      # subtag.send sprintf('%s=', key), stack.delete(key)
+      next if key == :description
       subtag.send sprintf('%s=', key), stack.delete(key)
+      return if stack.empty?
     end
     description = stack.delete(:description)
     subtag.add_description description if description

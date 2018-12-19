@@ -29,7 +29,9 @@ Description: Interlingua (International Auxiliary Language
     end
 
     it "returns 9070 subtags" do
-      expect(Registry.parse.subtags.count).to eq 9071
+      registry = Registry.parse
+      # byebug
+      expect(registry.subtags.count).to eq 9071
     end
 
     it "returns actual subtags" do
@@ -49,6 +51,15 @@ Description: Interlingua (International Auxiliary Language
       expect do
         registry.add_subtag Subtag.new(code: 'hi', descriptions: ["Hindi"])
       end.to change(registry.subtags, :count).by(1)
+    end
+  end
+
+  describe '.flush_stack' do
+    it "works" do
+      subtag = Subtag.new
+      stack = { code: "aa" }
+      Registry.flush_stack subtag, stack
+      expect(subtag.code).to eq "aa"
     end
   end
 end
