@@ -110,6 +110,6 @@ class Subtag
   end
 
   def empty?
-    SIMPLE_VALUES.all? { |key| !self.send(key) } && (!@descriptions || @descriptions && @descriptions.count == 0)
+    SIMPLE_VALUES.all? { |key| !self.send(key) } and !@descriptions || @descriptions && @descriptions.count == 0
   end
 end
