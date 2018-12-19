@@ -31,11 +31,11 @@ Description: Interlingua (International Auxiliary Language
     it "returns 9070 subtags" do
       registry = Registry.parse
       # byebug
-      expect(registry.subtags.count).to eq 9071
+      expect(registry.subtags.count).to eq 9070
     end
 
     it "returns actual subtags" do
-      expect(Registry.parse.subtags.select { |st| st.code == 'Hant' }).to eq ['Hant']
+      expect(Registry.parse.subtags.map(&:code).select { |code| code == 'Hant' }).to eq ['Hant']
     end
 
     it "wraps lines" do
