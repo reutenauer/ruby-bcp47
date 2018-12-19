@@ -16,20 +16,19 @@ class Registry
       subtag = Subtag.new
       stack = nil
       File.read(File.expand_path('../../language-subtag-registry', __dir__)).each_line do |line|
+        byebug
         if line =~ /^File-Date: (.*)$/ # TODO Use named parameters all around?
           @@registry.file_date = Date.parse($1)
         elsif line.strip == '%%' # TODO strip_right?
           @@registry.add_subtag subtag unless subtag.empty?
           subtag = Subtag.new
         elsif line =~ /^  (.*)$/
-          stack[stack.keys.first] = sprintf('%s %s', stack.values.first.strip, $1)
+          stack = [stack.first, sprintf('%s %s', stack.last.strip, $1)]
         elsif line =~ /^([A-Z][a-zA-Z-]+): (.*)$/
           flush_stack subtag, stack
           value = $2
           key = $1.gsub(/Subtag|Tag/, 'code').downcase.gsub('-', '_')
-          stack = Hash.new
-          # byebug
-          stack[key] = value
+          stack = [key, value]
         else
           # raise "Error: line type unknown: #{line}; subtag = #{subtag.code}" # FIXME temp
           # type = line.gsub(/^(.*?):.*/, $1).downcase
@@ -53,10 +52,11 @@ class Registry
     return unless stack
 
     # byebug if stack.keys.first == 'description'
-    if stack.keys.first == 'description'
-      subtag.add_description stack.values.first
+    if stack.first == 'description'
+      subtag.add_description stack.last
     else
-      subtag.send sprintf('%s=', stack.keys.first), stack.values.first
+      # byebug if stack == {code: 'aa'}
+      subtag.send sprintf('%s=', stack.first), stack.last
     end
   end
 end
