@@ -60,6 +60,26 @@ Description: Interlingua (International Auxiliary Language
       expect(subtag.code).to eq "aa"
     end
   end
+
+  describe "sanity checks" do
+    it "finds the subtag CS" do
+      serbia_and_montenegro = Registry.parse.subtags.select { |subtag| subtag.code == "CS" }.first
+      expect(serbia_and_montenegro.type).to eq "region"
+      expect(serbia_and_montenegro.descriptions).to eq ["Serbia and Montenegro"]
+    end
+
+    it "finds the subtag cs" do
+      czech = Registry.parse.subtags.select { |subtag| subtag.code == "cs" }.first
+      expect(czech.type).to eq "language"
+      expect(czech.descriptions).to eq ["Czech"]
+    end
+
+    it "finds the subtag Cyrs" do
+      cyrillic_ocs = Registry.parse.subtags.select { |subtag| subtag.code == "Cyrs" }.first
+      expect(cyrillic_ocs.type).to eq "script"
+      expect(cyrillic_ocs.descriptions).to eq ["Cyrillic (Old Church Slavonic variant)"]
+    end
+  end
 end
 
 describe Subtag do
