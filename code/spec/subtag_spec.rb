@@ -41,9 +41,6 @@ Description: Interlingua (International Auxiliary Language
       Registry.class_variable_set :@@registry, nil # FIXME!!
       registry = Registry.parse
       expect(registry.subtags.first.descriptions.first).to eq 'Interlingua (International Auxiliary Language Association)'
-    end
-
-    it "fixes its face afterwards" do # FIXME!!!
       Registry.class_variable_set :@@registry, nil
     end
   end
@@ -68,7 +65,6 @@ Description: Interlingua (International Auxiliary Language
   describe "sanity checks" do
     it "finds the subtag CS" do
       serbia_and_montenegro = Registry.parse.subtags.select { |subtag| subtag.code == "CS" }.first
-      byebug
       expect(serbia_and_montenegro.type).to eq "region"
       expect(serbia_and_montenegro.descriptions).to eq ["Serbia and Montenegro"]
     end
