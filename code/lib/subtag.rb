@@ -94,12 +94,12 @@ class Registry
 end
 
 class Subtag
-  KEYS = [:type, :code, :descriptions, :added, :suppress_script, :scope, :macrolanguage, :comments, :deprecated, :preferred_value, :tag, :prefix]
-  KEYS.each { |key| attr_accessor key }
+  SIMPLE_VALUES = [:type, :code, :added, :suppress_script, :scope, :macrolanguage, :comments, :deprecated, :preferred_value, :tag, :prefix]
+  SIMPLE_VALUES.each { |key| attr_accessor key }
+  attr_accessor :descriptions
 
   def initialize(params = { })
-    KEYS.each do |key|
-      next if key == :descriptions
+    SIMPLE_VALUES.each do |key|
       self.send sprintf('%s=', key), params[key]
     end
     @descriptions = params[:descriptions] || []
@@ -110,6 +110,6 @@ class Subtag
   end
 
   def empty?
-    !(@code || @type || @scope || @added || @suppress_script || @macrolanguage || @comments || @deprecated || @preferred_value || @tag || @prefix) && (!@descriptions || @descriptions && @descriptions.count == 0)
+    SIMPLE_VALUES.all? { |key| !self.send(key) } && (!@descriptions || @descriptions && @descriptions.count == 0)
   end
 end
