@@ -56,7 +56,7 @@ Description: Interlingua (International Auxiliary Language
   describe '.flush_stack' do
     it "works" do
       subtag = Subtag.new
-      stack = { code: "aa" }
+      stack = ['code', "aa"]
       Registry.flush_stack subtag, stack
       expect(subtag.code).to eq "aa"
     end

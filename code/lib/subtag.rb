@@ -16,7 +16,7 @@ class Registry
       subtag = Subtag.new
       stack = nil
       File.read(File.expand_path('../../language-subtag-registry', __dir__)).each_line do |line|
-        byebug
+        # byebug
         if line =~ /^File-Date: (.*)$/ # TODO Use named parameters all around?
           @@registry.file_date = Date.parse($1)
         elsif line.strip == '%%' # TODO strip_right?
