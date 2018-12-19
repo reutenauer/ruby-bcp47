@@ -94,21 +94,15 @@ class Registry
 end
 
 class Subtag
-  attr_accessor :type, :code, :descriptions, :added, :suppress_script, :scope, :macrolanguage, :comments, :deprecated, :preferred_value, :tag, :prefix
+  KEYS = [:type, :code, :descriptions, :added, :suppress_script, :scope, :macrolanguage, :comments, :deprecated, :preferred_value, :tag, :prefix]
+  KEYS.each { |key| attr_accessor key }
 
   def initialize(params = { })
-    @code = params[:code]
-    @type = params[:type]
-    @scope = params[:scope]
-    @added = params[:added]
-    @suppress_script = params[:suppress_script]
+    KEYS.each do |key|
+      next if key == :descriptions
+      self.send sprintf('%s=', key), params[key]
+    end
     @descriptions = params[:descriptions] || []
-    @macrolanguage = params[:macrolanguage]
-    @comments = params[:comments]
-    @deprecated = params[:deprecated]
-    @preferred_value = params[:preferred_value]
-    @tag = params[:tag]
-    @prefix = params[:prefix]
   end
 
   def add_description description
