@@ -81,15 +81,11 @@ class Registry
   def self.flush_stack subtag, stack # TODO Spec out!
     return unless stack
 
-    # puts stack[:code] if stack[:code]
-    # [:type, :code, :added, :suppress_script, :scope, :macrolanguage, :comments, :deprecated, :preferred_value, :tag, :prefix].each do |key|
-    stack.each do |key, value|
-      next if key == :description
-      subtag.send sprintf('%s=', key), stack.delete(key)
-      return if stack.empty?
+    if stack.keys.first == :description
+      subtag.add_description stack.values.first
+    else
+      subtag.send sprintf('%s=', stack.keys.first), stack.values.first
     end
-    description = stack.delete(:description)
-    subtag.add_description description if description
   end
 end
 
