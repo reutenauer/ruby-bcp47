@@ -23,42 +23,13 @@ class Registry
           subtag = Subtag.new
         elsif line =~ /^  (.*)$/
           stack[stack.keys.first] = sprintf('%s %s', stack.values.first.strip, $1)
-        elsif line =~ /^Type: (.*)$/
+        elsif line =~ /^([A-Z][a-zA-Z-]+): (.*)$/
           flush_stack subtag, stack
-          stack = { type: $1 }
-        elsif line =~ /^Subtag: (.*)$/
-          flush_stack subtag, stack
-          stack = { code: $1 }
-        elsif line =~ /^Description: (.*)$/
-          flush_stack subtag, stack
-          stack = { description: $1 }
-        elsif line =~ /^Added: (.*)$/
-          flush_stack subtag, stack
-          stack = { added: Date.parse($1) }
-        elsif line =~ /^Suppress-Script: (.*)$/
-          flush_stack subtag, stack
-          stack = { suppress_script: $1 }
-        elsif line =~ /^Scope: (.*)$/
-          flush_stack subtag, stack
-          stack = { scope: $1 }
-        elsif line =~ /^Macrolanguage: (.*)$/
-          flush_stack subtag, stack
-          stack = { macrolanguage: $1 } # TODO point to the actual entry!
-        elsif line =~ /^Comments: (.*)$/
-          flush_stack subtag, stack
-          stack = { comments: $1 }
-        elsif line =~ /^Deprecated: (.*)$/
-          flush_stack subtag, stack
-          stack = { deprecated: $1 }
-        elsif line =~ /^Preferred-Value: (.*)$/
-          flush_stack subtag, stack
-          stack = { preferred_value: $1 }
-        elsif line =~ /^Tag: (.*)$/
-          flush_stack subtag, stack
-          stack = { tag: $1 }
-        elsif line =~ /^Prefix: (.*)$/
-          flush_stack subtag, stack
-          stack = { prefix: $1 }
+          value = $2
+          key = $1.gsub(/Subtag|Tag/, 'code').downcase.gsub('-', '_')
+          stack = Hash.new
+          # byebug
+          stack[key] = value
         else
           # raise "Error: line type unknown: #{line}; subtag = #{subtag.code}" # FIXME temp
           # type = line.gsub(/^(.*?):.*/, $1).downcase
@@ -81,7 +52,8 @@ class Registry
   def self.flush_stack subtag, stack # TODO Spec out!
     return unless stack
 
-    if stack.keys.first == :description
+    # byebug if stack.keys.first == 'description'
+    if stack.keys.first == 'description'
       subtag.add_description stack.values.first
     else
       subtag.send sprintf('%s=', stack.keys.first), stack.values.first
