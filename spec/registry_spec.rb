@@ -1,5 +1,7 @@
 require 'spec_helper'
 
+include BCP47
+
 describe String do
   describe '#strip_right' do
     it "strips to the right" do
