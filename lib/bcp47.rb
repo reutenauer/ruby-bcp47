@@ -1,5 +1,5 @@
 require 'date'
-require 'byebug'
+require 'byebug' unless ENV['RACK_ENV'] == "production"
 require 'net/http'
 require 'uri'
 
