@@ -3,6 +3,8 @@ require 'byebug'
 require 'net/http'
 require 'uri'
 
+class NilKey < StandardError; end
+
 class String
   def strip_right
     gsub /\s*$/, ''
@@ -11,6 +13,8 @@ end
 
 class Hash
   def <= key, value
+    raise NilKey unless key
+
     existing = self[key]
     if existing
       if existing.is_a? Enumerable
@@ -58,7 +62,7 @@ class Registry
 
       raise "Missed types: #{@@missed_types.uniq}" if @@missed_types.count > 0
       subtag.flush_stack stack unless stack.empty?
-      subtags.<= subtag.code, subtag unless subtag.empty? # TODO Raise exceptions if no code
+      subtags.<= subtag.code, subtag unless subtag.empty?
     end
   end
 

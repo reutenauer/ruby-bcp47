@@ -27,6 +27,10 @@ describe Hash do
       composite.<= :a, 3
       expect(composite).to be == { a: [1, 2, 3] }
     end
+
+    it "raises an exception if key is nil" do
+      expect { Hash.new.<= nil, 'value' }.to raise_exception NilKey
+    end
   end
 end
 
