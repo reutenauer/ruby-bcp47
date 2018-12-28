@@ -44,6 +44,7 @@ module BCP47
           if line =~ /^File-Date: (.*)$/ # TODO Use named parameters all around?
             @@file_date = Date.parse($1)
           elsif line.strip_right == '%%'
+            stack = nil
             unless subtag.empty?
               subtags.<= subtag.code, subtag
             end

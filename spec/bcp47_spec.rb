@@ -141,6 +141,10 @@ Description: Interlingua (International Auxiliary Language
       expect(cyrillic_ocs.type).to eq "script"
       expect(cyrillic_ocs.descriptions).to eq ["Cyrillic (Old Church Slavonic variant)"]
     end
+
+    it "is not buggy" do
+      expect(Registry['mo'].scope).to be_nil
+    end
   end
 end
 
