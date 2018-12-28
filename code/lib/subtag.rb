@@ -8,25 +8,26 @@ class String
 end
 
 class Registry
-  attr_accessor :file_date, :subtags
-  @@registry = nil
-
   def initialize
     @subtags = []
   end
 
-  def self.parse
-    unless @@registry
-      @@registry = new
+  def file_date
+    subtags if @subtags.count == 0
+    @file_date
+  end
+
+  def subtags
+    if @subtags.count == 0
       @@missed_types = []
       subtag = Subtag.new
       stack = nil
       File.read(File.expand_path('../../language-subtag-registry', __dir__)).each_line do |line|
         # byebug
         if line =~ /^File-Date: (.*)$/ # TODO Use named parameters all around?
-          @@registry.file_date = Date.parse($1)
+          @file_date = Date.parse($1)
         elsif line.strip_right == '%%'
-          @@registry << subtag unless subtag.empty?
+          @subtags << subtag unless subtag.empty?
           subtag = Subtag.new
         elsif line =~ /^  (.*)$/
           stack = [stack.first, sprintf('%s %s', stack.last.strip, $1)]
@@ -43,10 +44,10 @@ class Registry
 
       raise "Missed types: #{@@missed_types.uniq}" if @@missed_types.count > 0
       subtag.flush_stack stack unless stack.empty?
-      @@registry << subtag unless subtag.empty?
+      @subtags << subtag unless subtag.empty?
     end
 
-    @@registry
+    @subtags
   end
 
   def <<(subtag)
