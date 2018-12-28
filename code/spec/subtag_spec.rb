@@ -1,5 +1,13 @@
 require 'spec_helper'
 
+describe String do
+  describe '#strip_right' do
+    it "strips to the right" do
+      expect(" foo   ".strip_right).to eq " foo"
+    end
+  end
+end
+
 describe Registry do
   let(:registry) { Registry.new }
   let(:interlingua) do
@@ -43,22 +51,27 @@ Description: Interlingua (International Auxiliary Language
       expect(registry.subtags.first.descriptions.first).to eq 'Interlingua (International Auxiliary Language Association)'
       Registry.class_variable_set :@@registry, nil
     end
-  end
 
-  describe '#add_subtag' do
-    it "adds a subtag to the registry" do
-      expect do
-        registry.add_subtag Subtag.new(code: 'hi', descriptions: ["Hindi"])
-      end.to change(registry.subtags, :count).by(1)
+    it "caches the result" do
+      Registry.class_variable_set :@@registry, nil
+      Registry.parse
+      expect(Registry.class_variable_get(:@@registry).subtags.count).to eq 9070
+    end
+
+    it "only opens the registry file once" do
+      Registry.class_variable_set :@@registry, nil
+      expect(File).to receive(:read).exactly(:once).and_return("File-Date: 2018-12-28\n%%\nSubtag: aa\nDescription: Afar")
+      Registry.parse
+      Registry.parse
+      Registry.class_variable_set :@@registry, nil
     end
   end
 
-  describe '.flush_stack' do
-    it "works" do
-      subtag = Subtag.new
-      stack = ['code', "aa"]
-      Registry.flush_stack subtag, stack
-      expect(subtag.code).to eq "aa"
+  describe '#<<' do
+    it "adds a subtag to the registry" do
+      expect do
+        registry.<< Subtag.new(code: 'hi', descriptions: ["Hindi"])
+      end.to change(registry.subtags, :count).by(1)
     end
   end
 
@@ -172,6 +185,22 @@ describe Subtag do
       expect do
         subtag.add_description "Afar"
       end.to change(subtag.descriptions, :count).by(1)
+    end
+  end
+
+  describe '#flush_stack' do
+    it "overwrites simple fields" do
+      subtag = Subtag.new
+      stack = ['code', "aa"]
+      subtag.flush_stack stack
+      expect(subtag.code).to eq "aa"
+    end
+
+    it "adds to cumulative fields" do
+      subtag = Subtag.new
+      stack = ['description', 'The AA Language']
+      subtag.flush_stack stack
+      expect(subtag.descriptions).to eq ['The AA Language']
     end
   end
 end

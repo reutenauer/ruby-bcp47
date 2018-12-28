@@ -1,6 +1,12 @@
 require 'date'
 require 'byebug'
 
+class String
+  def strip_right
+    gsub /\s*$/, ''
+  end
+end
+
 class Registry
   attr_accessor :file_date, :subtags
   @@registry = nil
@@ -11,7 +17,7 @@ class Registry
 
   def self.parse
     unless @@registry
-      @@registry = new # TODO Spec out that we cache
+      @@registry = new
       @@missed_types = []
       subtag = Subtag.new
       stack = nil
@@ -19,45 +25,32 @@ class Registry
         # byebug
         if line =~ /^File-Date: (.*)$/ # TODO Use named parameters all around?
           @@registry.file_date = Date.parse($1)
-        elsif line.strip == '%%' # TODO strip_right?
-          @@registry.add_subtag subtag unless subtag.empty?
+        elsif line.strip_right == '%%'
+          @@registry << subtag unless subtag.empty?
           subtag = Subtag.new
         elsif line =~ /^  (.*)$/
           stack = [stack.first, sprintf('%s %s', stack.last.strip, $1)]
         elsif line =~ /^([A-Z][a-zA-Z-]+): (.*)$/
-          flush_stack subtag, stack
+          subtag.flush_stack stack
           value = $2
           key = $1.gsub(/Subtag|Tag/, 'code').downcase.gsub('-', '_')
           stack = [key, value]
         else
-          # raise "Error: line type unknown: #{line}; subtag = #{subtag.code}" # FIXME temp
           # type = line.gsub(/^(.*?):.*/, $1).downcase
           @@missed_types << line
         end
       end
 
       raise "Missed types: #{@@missed_types.uniq}" if @@missed_types.count > 0
-      flush_stack subtag, stack unless stack.empty?
-      @@registry.add_subtag subtag unless subtag.empty?
+      subtag.flush_stack stack unless stack.empty?
+      @@registry << subtag unless subtag.empty?
     end
 
     @@registry
   end
 
-  def add_subtag(subtag) # TODO << ?
+  def <<(subtag)
     @subtags << subtag
-  end
-
-  def self.flush_stack subtag, stack # TODO Spec out!
-    return unless stack
-
-    # byebug if stack.keys.first == 'description'
-    if stack.first == 'description'
-      subtag.add_description stack.last
-    else
-      # byebug if stack == {code: 'aa'}
-      subtag.send sprintf('%s=', stack.first), stack.last
-    end
   end
 end
 
@@ -79,5 +72,17 @@ class Subtag
 
   def empty?
     SIMPLE_VALUES.all? { |key| !self.send(key) } and !@descriptions || @descriptions && @descriptions.count == 0
+  end
+
+  def flush_stack stack
+    return unless stack
+
+    # byebug if stack.keys.first == 'description'
+    if stack.first == 'description'
+      add_description stack.last
+    else
+      # byebug if stack == {code: 'aa'}
+      send sprintf('%s=', stack.first), stack.last
+    end
   end
 end
