@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'bcp47'
-  s.version = '0.0.1'
+  s.version = '0.0.2'
   s.date = '2018-12-28'
   s.summary = 'Ruby representation of the BCP47 Language Subtag Registry'
   s.authors = ['Arthur Reutenauer']
