@@ -31,33 +31,41 @@ Description: Interlingua (International Auxiliary Language
   end
 
   it "has subtags" do
-    expect(Registry.subtags).to be_an Array
+    expect(Registry.subtags).to be_a Hash
   end
 
   describe '.subtags' do
     it "returns the subtags" do
-      expect(Registry.subtags.map(&:class).uniq).to eq [Subtag]
+      expect(Registry.subtags.map { |key, value| value.class }.uniq).to eq [Subtag, Array]
     end
 
-    it "returns 9070 subtags" do
-      expect(Registry.subtags.count).to eq 9070
+    it "returns 8835 subtags" do
+      expect(Registry.subtags.count).to eq 8835
+    end
+
+    it "returns 9070 entries" do
+      count = Registry.subtags.inject(0) do |total, entry|
+        subtag = entry.last
+        total + if subtag.is_a? Subtag then 1 else subtag.count end
+      end
+      expect(count).to eq 9070
     end
 
     it "returns actual subtags" do
-      expect(Registry.subtags.map(&:code).select { |code| code == 'Hant' }).to eq ['Hant']
+      expect(Registry['Hant']).to be_a Subtag
     end
 
     it "wraps lines" do
       allow(Net::HTTP).to receive(:get).and_return interlingua
       Registry.class_variable_set :@@subtags, nil
       subtags = Registry.subtags
-      expect(subtags.first.descriptions.first).to eq 'Interlingua (International Auxiliary Language Association)'
+      expect(subtags.first.last.descriptions.first).to eq 'Interlingua (International Auxiliary Language Association)'
       Registry.class_variable_set :@@subtags, nil
     end
 
     it "caches the result" do
       Registry.subtags
-      expect(Registry.class_variable_get(:@@subtags).count).to eq 9070
+      expect(Registry.class_variable_get(:@@subtags).count).to eq 8835
     end
 
     it "only opens the registry file once" do
@@ -67,23 +75,41 @@ Description: Interlingua (International Auxiliary Language
       Registry.subtags
       Registry.class_variable_set :@@subtags, nil
     end
+
+    it "deals with duplicate entries" do
+      expect(Registry['cmn']).to be_an Array
+    end
+  end
+
+  describe '#[]' do
+    it "returns values from the registry hash" do
+      german = Registry['de']
+      expect(german).to be_a Subtag
+      expect(german.code).to eq 'de' # TODO List subtag with ‘de’ as recommended prefix?
+      expect(german.descriptions).to eq ['German']
+    end
+
+    it "calls .subtags first" do
+      expect(Registry).to receive(:subtags).and_return({ 'pt' => Subtag.new(code: 'pt', descriptions: 'Portuguese') })
+      Registry['pt']
+    end
   end
 
   describe "sanity checks" do
     it "finds the subtag CS" do
-      serbia_and_montenegro = Registry.subtags.select { |subtag| subtag.code == "CS" }.first
+      serbia_and_montenegro = Registry["CS"]
       expect(serbia_and_montenegro.type).to eq "region"
       expect(serbia_and_montenegro.descriptions).to eq ["Serbia and Montenegro"]
     end
 
     it "finds the subtag cs" do
-      czech = Registry.subtags.select { |subtag| subtag.code == "cs" }.first
+      czech = Registry["cs"]
       expect(czech.type).to eq "language"
       expect(czech.descriptions).to eq ["Czech"]
     end
 
     it "finds the subtag Cyrs" do
-      cyrillic_ocs = Registry.subtags.select { |subtag| subtag.code == "Cyrs" }.first
+      cyrillic_ocs = Registry["Cyrs"]
       expect(cyrillic_ocs.type).to eq "script"
       expect(cyrillic_ocs.descriptions).to eq ["Cyrillic (Old Church Slavonic variant)"]
     end

@@ -16,7 +16,7 @@ class Registry
   end
 
   def self.subtags
-    @@subtags ||= Array.new.tap do |subtags|
+    @@subtags ||= Hash.new.tap do |subtags|
       @@missed_types = []
       subtag = Subtag.new
       stack = nil
@@ -24,7 +24,18 @@ class Registry
         if line =~ /^File-Date: (.*)$/ # TODO Use named parameters all around?
           @@file_date = Date.parse($1)
         elsif line.strip_right == '%%'
-          subtags << subtag unless subtag.empty?
+          unless subtag.empty?
+            existing = subtags[subtag.code]
+            if existing
+              if existing.is_a? Array
+                subtags[subtag.code] << subtags
+              else
+                subtags[subtag.code] = [existing, subtag]
+              end
+            else
+              subtags[subtag.code] = subtag
+            end
+          end
           subtag = Subtag.new
         elsif line =~ /^  (.*)$/
           stack = [stack.first, sprintf('%s %s', stack.last.strip, $1)]
@@ -41,8 +52,12 @@ class Registry
 
       raise "Missed types: #{@@missed_types.uniq}" if @@missed_types.count > 0
       subtag.flush_stack stack unless stack.empty?
-      subtags << subtag unless subtag.empty?
+      subtags[subtag.code] = subtag unless subtag.empty? # TODO Raise exceptions if no code, if duplicate
     end
+  end
+
+  def self.[] code
+    subtags[code]
   end
 end
 
