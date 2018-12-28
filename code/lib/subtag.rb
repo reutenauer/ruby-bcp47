@@ -61,7 +61,7 @@ class Subtag
   end
 
   def empty?
-    SIMPLE_VALUES.all? { |key| !self.send(key) } and !@descriptions || @descriptions && @descriptions.count == 0
+    SIMPLE_VALUES.none? { |key| send(key) } and !@descriptions || @descriptions && @descriptions.count == 0
   end
 
   def flush_stack stack
