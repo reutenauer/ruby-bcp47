@@ -1,5 +1,7 @@
 require 'date'
 require 'byebug'
+require 'net/http'
+require 'uri'
 
 class String
   def strip_right
@@ -18,7 +20,7 @@ class Registry
       @@missed_types = []
       subtag = Subtag.new
       stack = nil
-      File.read(File.expand_path('../../language-subtag-registry', __dir__)).each_line do |line|
+      Net::HTTP.get(URI('https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry')).each_line do |line|
         if line =~ /^File-Date: (.*)$/ # TODO Use named parameters all around?
           @@file_date = Date.parse($1)
         elsif line.strip_right == '%%'

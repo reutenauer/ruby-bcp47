@@ -48,7 +48,7 @@ Description: Interlingua (International Auxiliary Language
     end
 
     it "wraps lines" do
-      allow(File).to receive(:read).and_return interlingua
+      allow(Net::HTTP).to receive(:get).and_return interlingua
       Registry.class_variable_set :@@subtags, nil
       subtags = Registry.subtags
       expect(subtags.first.descriptions.first).to eq 'Interlingua (International Auxiliary Language Association)'
@@ -62,7 +62,7 @@ Description: Interlingua (International Auxiliary Language
 
     it "only opens the registry file once" do
       Registry.class_variable_set :@@subtags, nil
-      expect(File).to receive(:read).exactly(:once).and_return("File-Date: 2018-12-28\n%%\nSubtag: aa\nDescription: Afar")
+      expect(Net::HTTP).to receive(:get).exactly(:once).and_return("File-Date: 2018-12-28\n%%\nSubtag: aa\nDescription: Afar")
       Registry.subtags
       Registry.subtags
       Registry.class_variable_set :@@subtags, nil
