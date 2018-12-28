@@ -41,7 +41,6 @@ module BCP47
         subtag = Subtag.new
         stack = nil
         Net::HTTP.get(URI('https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry')).each_line do |line|
-          # byebug if line == "Macrolanguage: no\n"
           if line =~ /^File-Date: (.*)$/ # TODO Use named parameters all around?
             @@file_date = Date.parse($1)
           elsif line.strip_right == '%%'
@@ -96,7 +95,6 @@ module BCP47
     end
 
     def flush_stack stack
-      # byebug if @code == 'nb' && stack.first == 'macrolanguage'
       return unless stack && !stack.empty?
 
       if stack.first == 'description'

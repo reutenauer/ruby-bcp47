@@ -251,18 +251,24 @@ describe Subtag do
   end
 
   describe '#flush_stack' do
+    let(:subtag) { Subtag.new }
+
     it "overwrites simple fields" do
-      subtag = Subtag.new
-      stack = ['code', "aa"]
-      subtag.flush_stack stack
+      subtag.flush_stack ['code', "aa"]
       expect(subtag.code).to eq "aa"
     end
 
     it "adds to cumulative fields" do
-      subtag = Subtag.new
-      stack = ['description', 'The AA Language']
-      subtag.flush_stack stack
+      subtag.flush_stack ['description', 'The AA Language']
       expect(subtag.descriptions).to eq ['The AA Language']
+    end
+
+    it "doesn’t crash on an empty argument" do
+      expect { subtag.flush_stack [] }.not_to raise_exception
+    end
+
+    it "doesn’t crash on a nil argument" do
+      expect { subtag.flush_stack nil }.not_to raise_exception
     end
   end
 end
