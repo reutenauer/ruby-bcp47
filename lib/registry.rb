@@ -9,6 +9,21 @@ class String
   end
 end
 
+class Hash
+  def <= key, value
+    existing = self[key]
+    if existing
+      if existing.is_a? Enumerable
+        self[key] << value
+      else
+        self[key] = [existing, value]
+      end
+    else
+      self[key] = value
+    end
+  end
+end
+
 class Registry
   def self.file_date
     subtags
@@ -25,16 +40,7 @@ class Registry
           @@file_date = Date.parse($1)
         elsif line.strip_right == '%%'
           unless subtag.empty?
-            existing = subtags[subtag.code]
-            if existing
-              if existing.is_a? Array
-                subtags[subtag.code] << subtags
-              else
-                subtags[subtag.code] = [existing, subtag]
-              end
-            else
-              subtags[subtag.code] = subtag
-            end
+            subtags.<= subtag.code, subtag
           end
           subtag = Subtag.new
         elsif line =~ /^  (.*)$/
@@ -52,7 +58,7 @@ class Registry
 
       raise "Missed types: #{@@missed_types.uniq}" if @@missed_types.count > 0
       subtag.flush_stack stack unless stack.empty?
-      subtags[subtag.code] = subtag unless subtag.empty? # TODO Raise exceptions if no code, if duplicate
+      subtags.<= subtag.code, subtag unless subtag.empty? # TODO Raise exceptions if no code
     end
   end
 

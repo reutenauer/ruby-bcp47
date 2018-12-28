@@ -8,6 +8,28 @@ describe String do
   end
 end
 
+describe Hash do
+  describe '#<=' do
+    it "inserts or append" do
+      empty = Hash.new
+      empty.<= :a, 1
+      expect(empty).to be == { a: 1 }
+    end
+
+    it "appends to a scalar entry" do
+      scalar = { a: 1 }
+      scalar.<= :a, 2
+      expect(scalar).to eq(a: [1, 2])
+    end
+
+    it "appends to a composite entry" do
+      composite = { a: [1, 2] }
+      composite.<= :a, 3
+      expect(composite).to be == { a: [1, 2, 3] }
+    end
+  end
+end
+
 describe Registry do
   let(:registry) { Registry.new }
   let(:interlingua) do
