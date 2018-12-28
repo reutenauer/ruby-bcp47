@@ -19,7 +19,6 @@ class Registry
       subtag = Subtag.new
       stack = nil
       File.read(File.expand_path('../../language-subtag-registry', __dir__)).each_line do |line|
-        # byebug
         if line =~ /^File-Date: (.*)$/ # TODO Use named parameters all around?
           @@file_date = Date.parse($1)
         elsif line.strip_right == '%%'
@@ -68,11 +67,9 @@ class Subtag
   def flush_stack stack
     return unless stack
 
-    # byebug if stack.keys.first == 'description'
     if stack.first == 'description'
       add_description stack.last
     else
-      # byebug if stack == {code: 'aa'}
       send sprintf('%s=', stack.first), stack.last
     end
   end
