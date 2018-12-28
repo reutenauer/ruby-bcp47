@@ -8,18 +8,13 @@ class String
 end
 
 class Registry
-  @@subtags = []
-
-  def initialize
-  end
-
   def self.file_date
-    subtags if @@subtags.count == 0
+    subtags
     @@file_date
   end
 
   def self.subtags
-    if @@subtags.count == 0
+    @@subtags ||= Array.new.tap do |subtags|
       @@missed_types = []
       subtag = Subtag.new
       stack = nil
@@ -28,7 +23,7 @@ class Registry
         if line =~ /^File-Date: (.*)$/ # TODO Use named parameters all around?
           @@file_date = Date.parse($1)
         elsif line.strip_right == '%%'
-          @@subtags << subtag unless subtag.empty?
+          subtags << subtag unless subtag.empty?
           subtag = Subtag.new
         elsif line =~ /^  (.*)$/
           stack = [stack.first, sprintf('%s %s', stack.last.strip, $1)]
@@ -45,10 +40,8 @@ class Registry
 
       raise "Missed types: #{@@missed_types.uniq}" if @@missed_types.count > 0
       subtag.flush_stack stack unless stack.empty?
-      @@subtags << subtag unless subtag.empty?
+      subtags << subtag unless subtag.empty?
     end
-
-    @@subtags
   end
 end
 

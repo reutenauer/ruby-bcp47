@@ -19,8 +19,15 @@ Description: Interlingua (International Auxiliary Language
   EOIA
   end
 
-  it "has a file date" do
-    expect(Registry.file_date).to eq Date.new(2018, 11, 30)
+  describe '.file_date' do
+    it "returns the registry file’s date" do
+      expect(Registry.file_date).to eq Date.new(2018, 11, 30)
+    end
+
+    it "calls .subtags first" do
+      expect(Registry).to receive :subtags
+      Registry.file_date
+    end
   end
 
   it "has subtags" do
@@ -42,24 +49,23 @@ Description: Interlingua (International Auxiliary Language
 
     it "wraps lines" do
       allow(File).to receive(:read).and_return interlingua
-      Registry.class_variable_set :@@subtags, [] # FIXME!!
+      Registry.class_variable_set :@@subtags, nil
       subtags = Registry.subtags
       expect(subtags.first.descriptions.first).to eq 'Interlingua (International Auxiliary Language Association)'
-      Registry.class_variable_set :@@subtags, []
+      Registry.class_variable_set :@@subtags, nil
     end
 
     it "caches the result" do
-      Registry.class_variable_set :@@subtags, []
       Registry.subtags
       expect(Registry.class_variable_get(:@@subtags).count).to eq 9070
     end
 
     it "only opens the registry file once" do
-      Registry.class_variable_set :@@subtags, []
+      Registry.class_variable_set :@@subtags, nil
       expect(File).to receive(:read).exactly(:once).and_return("File-Date: 2018-12-28\n%%\nSubtag: aa\nDescription: Afar")
       Registry.subtags
       Registry.subtags
-      Registry.class_variable_set :@@subtags, []
+      Registry.class_variable_set :@@subtags, nil
     end
   end
 
