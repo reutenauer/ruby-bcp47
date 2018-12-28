@@ -41,9 +41,11 @@ module BCP47
         subtag = Subtag.new
         stack = nil
         Net::HTTP.get(URI('https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry')).each_line do |line|
+          # byebug if line == "Macrolanguage: no\n"
           if line =~ /^File-Date: (.*)$/ # TODO Use named parameters all around?
             @@file_date = Date.parse($1)
           elsif line.strip_right == '%%'
+            subtag.flush_stack stack
             stack = nil
             unless subtag.empty?
               subtags.<= subtag.code, subtag
@@ -63,7 +65,7 @@ module BCP47
         end
 
         raise "Missed types: #{@@missed_types.uniq}" if @@missed_types.count > 0
-        subtag.flush_stack stack unless stack.empty?
+        subtag.flush_stack stack
         subtags.<= subtag.code, subtag unless subtag.empty?
       end
     end
@@ -74,7 +76,7 @@ module BCP47
   end
 
   class Subtag
-    SIMPLE_VALUES = [:type, :code, :added, :suppress_script, :scope, :macrolanguage, :comments, :deprecated, :preferred_value, :tag, :prefix]
+    SIMPLE_VALUES = [:type, :code, :added, :suppress_script, :scope, :macrolanguage, :comments, :deprecated, :preferred_value, :prefix]
     SIMPLE_VALUES.each { |key| attr_accessor key }
     attr_accessor :descriptions
 
@@ -94,12 +96,16 @@ module BCP47
     end
 
     def flush_stack stack
-      return unless stack
+      # byebug if @code == 'nb' && stack.first == 'macrolanguage'
+      return unless stack && !stack.empty?
 
       if stack.first == 'description'
         add_description stack.last
       else
-        send sprintf('%s=', stack.first), stack.last
+        key = stack.first
+        value = stack.last
+        value = Date.parse(value) if key == 'added'
+        send sprintf('%s=', key), value
       end
     end
   end

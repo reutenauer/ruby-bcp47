@@ -145,6 +145,16 @@ Description: Interlingua (International Auxiliary Language
     it "is not buggy" do
       expect(Registry['mo'].scope).to be_nil
     end
+
+    it "really isn’t buggy" do
+      bokmål = Registry['nb']
+      expect(bokmål.macrolanguage).to eq 'no'
+    end
+
+    it "parses the added date" do
+      bokmål = Registry['nb']
+      expect(bokmål.added).to eq Date.new(2005, 10, 16)
+    end
   end
 end
 
