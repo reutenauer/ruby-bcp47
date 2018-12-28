@@ -20,72 +20,64 @@ Description: Interlingua (International Auxiliary Language
   end
 
   it "has a file date" do
-    expect(registry.file_date).to eq Date.new(2018, 11, 30)
+    expect(Registry.file_date).to eq Date.new(2018, 11, 30)
   end
 
   it "has subtags" do
-    expect(registry.subtags).to be_an Array
+    expect(Registry.subtags).to be_an Array
   end
 
   describe '.subtags' do
     it "returns the subtags" do
-      expect(registry.subtags.map(&:class).uniq).to eq [Subtag]
+      expect(Registry.subtags.map(&:class).uniq).to eq [Subtag]
     end
 
     it "returns 9070 subtags" do
-      expect(registry.subtags.count).to eq 9070
+      expect(Registry.subtags.count).to eq 9070
     end
 
     it "returns actual subtags" do
-      expect(registry.subtags.map(&:code).select { |code| code == 'Hant' }).to eq ['Hant']
+      expect(Registry.subtags.map(&:code).select { |code| code == 'Hant' }).to eq ['Hant']
     end
 
     it "wraps lines" do
       allow(File).to receive(:read).and_return interlingua
-      registry.instance_variable_set :@subtags, [] # FIXME!!
-      subtags = registry.subtags
+      Registry.class_variable_set :@@subtags, [] # FIXME!!
+      subtags = Registry.subtags
       expect(subtags.first.descriptions.first).to eq 'Interlingua (International Auxiliary Language Association)'
-      registry.instance_variable_set :@subtags, []
+      Registry.class_variable_set :@@subtags, []
     end
 
     it "caches the result" do
-      registry.instance_variable_set :@subtags, []
-      registry.subtags
-      expect(registry.instance_variable_get(:@subtags).count).to eq 9070
+      Registry.class_variable_set :@@subtags, []
+      Registry.subtags
+      expect(Registry.class_variable_get(:@@subtags).count).to eq 9070
     end
 
     it "only opens the registry file once" do
-      registry.instance_variable_set :@subtags, []
+      Registry.class_variable_set :@@subtags, []
       expect(File).to receive(:read).exactly(:once).and_return("File-Date: 2018-12-28\n%%\nSubtag: aa\nDescription: Afar")
-      registry.subtags
-      registry.subtags
-      registry.instance_variable_set :@subtags, []
-    end
-  end
-
-  describe '#<<' do
-    it "adds a subtag to the registry" do
-      expect do
-        registry.<< Subtag.new(code: 'hi', descriptions: ["Hindi"])
-      end.to change(registry.subtags, :count).by(1)
+      Registry.subtags
+      Registry.subtags
+      Registry.class_variable_set :@@subtags, []
     end
   end
 
   describe "sanity checks" do
     it "finds the subtag CS" do
-      serbia_and_montenegro = registry.subtags.select { |subtag| subtag.code == "CS" }.first
+      serbia_and_montenegro = Registry.subtags.select { |subtag| subtag.code == "CS" }.first
       expect(serbia_and_montenegro.type).to eq "region"
       expect(serbia_and_montenegro.descriptions).to eq ["Serbia and Montenegro"]
     end
 
     it "finds the subtag cs" do
-      czech = registry.subtags.select { |subtag| subtag.code == "cs" }.first
+      czech = Registry.subtags.select { |subtag| subtag.code == "cs" }.first
       expect(czech.type).to eq "language"
       expect(czech.descriptions).to eq ["Czech"]
     end
 
     it "finds the subtag Cyrs" do
-      cyrillic_ocs = registry.subtags.select { |subtag| subtag.code == "Cyrs" }.first
+      cyrillic_ocs = Registry.subtags.select { |subtag| subtag.code == "Cyrs" }.first
       expect(cyrillic_ocs.type).to eq "script"
       expect(cyrillic_ocs.descriptions).to eq ["Cyrillic (Old Church Slavonic variant)"]
     end
