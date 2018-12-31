@@ -123,17 +123,20 @@ module BCP47
 
     def bureaucratic_name
       subtags = @code.split '-'
-      language = subtags.shift
+      bnames = [Registry[subtags.shift].bureaucratic_name]
       if subtags.count > 0
         nsubtag = subtags.shift
         if nsubtag.length == 2
-          nbname = Registry[nsubtag.upcase]
+          nbname = Registry[nsubtag.upcase].bureaucratic_name
         elsif nsubtag.length == 4
-          nbname = Registry[nsubtag.capitalize]
+          nbname = Registry[nsubtag.capitalize].bureaucratic_name
         else
-          nbname = Registry[nsubtag]
+          nbname = Registry[nsubtag].bureaucratic_name
         end
+        bnames << nbname
       end
+
+      bnames.join ', '
     end
   end
 end

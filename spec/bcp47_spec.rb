@@ -292,8 +292,11 @@ describe Tag do
     it "combines the subtags’ bureaucratic names" do
       expect(Tag.new('en-us').bureaucratic_name).to eq "English, United States"
       expect(Tag.new('de-1901').bureaucratic_name).to eq "German, Traditional German orthography"
-      expect(Tag.new('el-polytonic').bureaucratic_name).to eq "Greek, Polytonic Greek"
+      expect(Tag.new('el-polyton').bureaucratic_name).to eq "Modern Greek (1453-), Polytonic Greek"
       expect(Tag.new('mn-cyrl').bureaucratic_name).to eq "Mongolian, Cyrillic"
     end
+
+    it "behaves well with private entries"
+    it "doesn’t crash on nonexistent entries, etc."
   end
 end
