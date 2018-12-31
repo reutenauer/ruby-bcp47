@@ -8,6 +8,12 @@ describe String do
       expect(" foo   ".strip_right).to eq " foo"
     end
   end
+
+  describe '#capitalize' do
+    it "capitalises" do
+      expect('hans'.capitalize).to eq "Hans"
+    end
+  end
 end
 
 describe Hash do
@@ -269,6 +275,25 @@ describe Subtag do
 
     it "doesn’t crash on a nil argument" do
       expect { subtag.flush_stack nil }.not_to raise_exception
+    end
+  end
+
+  describe '#bureaucratic_name' do
+    it "returns the first description entry of the registry" do
+      expect(Registry['en'].bureaucratic_name).to eq "English"
+      expect(Registry['or'].bureaucratic_name).to eq "Oriya (macrolanguage)"
+      expect(Registry['fa'].bureaucratic_name).to eq "Persian"
+    end
+  end
+end
+
+describe Tag do
+  describe '#bureaucratic_name' do
+    it "combines the subtags’ bureaucratic names" do
+      expect(Tag.new('en-us').bureaucratic_name).to eq "English, United States"
+      expect(Tag.new('de-1901').bureaucratic_name).to eq "German, Traditional German orthography"
+      expect(Tag.new('el-polytonic').bureaucratic_name).to eq "Greek, Polytonic Greek"
+      expect(Tag.new('mn-cyrl').bureaucratic_name).to eq "Mongolian, Cyrillic"
     end
   end
 end

@@ -9,6 +9,10 @@ class String
   def strip_right
     gsub /\s*$/, ''
   end
+
+  def capitalize
+    self[0].upcase + self[1..-1].downcase
+  end
 end
 
 class Hash
@@ -104,6 +108,31 @@ module BCP47
         value = stack.last
         value = Date.parse(value) if key == 'added'
         send sprintf('%s=', key), value
+      end
+    end
+  end
+
+  def bureaucratic_name
+    descriptions.first
+  end
+
+  class Tag
+    def initialize(code)
+      @code = code
+    end
+
+    def bureaucratic_name
+      subtags = @code.split '-'
+      language = subtags.shift
+      if subtags.count > 0
+        nsubtag = subtags.shift
+        if nsubtag.length == 2
+          nbname = Registry[nsubtag.upcase]
+        elsif nsubtag.length == 4
+          nbname = Registry[nsubtag.capitalize]
+        else
+          nbname = Registry[nsubtag]
+        end
       end
     end
   end
