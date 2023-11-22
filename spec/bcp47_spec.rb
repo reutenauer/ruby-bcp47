@@ -55,7 +55,7 @@ Description: Interlingua (International Auxiliary Language
 
   describe '.file_date' do
     it "returns the registry file’s date" do
-      expect(Registry.file_date).to eq Date.new(2018, 11, 30)
+      expect(Registry.file_date).to eq Date.new(2023, 10, 16)
     end
 
     it "calls .subtags first" do
@@ -73,16 +73,16 @@ Description: Interlingua (International Auxiliary Language
       expect(Registry.subtags.map { |key, value| value.class }.uniq).to eq [Subtag, Array]
     end
 
-    it "returns 8835 subtags" do
-      expect(Registry.subtags.count).to eq 8835
+    it "returns 8992 subtags" do
+      expect(Registry.subtags.count).to eq 8992
     end
 
-    it "returns 9070 entries" do
+    it "returns 9245 entries" do
       count = Registry.subtags.inject(0) do |total, entry|
         subtag = entry.last
         total + if subtag.is_a? Subtag then 1 else subtag.count end
       end
-      expect(count).to eq 9070
+      expect(count).to eq 9245
     end
 
     it "returns actual subtags" do
@@ -99,7 +99,7 @@ Description: Interlingua (International Auxiliary Language
 
     it "caches the result" do
       Registry.subtags
-      expect(Registry.class_variable_get(:@@subtags).count).to eq 8835
+      expect(Registry.class_variable_get(:@@subtags).count).to eq 8992
     end
 
     it "only opens the registry file once" do
