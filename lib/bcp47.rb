@@ -1,3 +1,4 @@
+# Copyright Arthur Rosendahl 2018, 2019, 2023.  MIT Licence (https://opensource.org/licenses/MIT)
 require 'date'
 require 'byebug' unless ENV['RACK_ENV'] == "production"
 require 'net/http'

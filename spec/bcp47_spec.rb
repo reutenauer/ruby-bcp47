@@ -1,3 +1,4 @@
+# Copyright 2018, 2019, 2023 Arthur Rosendahl.  MIT Licence (https://opensource.org/licenses/MIT)
 require 'spec_helper'
 
 include BCP47
