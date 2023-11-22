@@ -55,7 +55,7 @@ module BCP47
             end
             subtag = Subtag.new
           elsif line =~ /^  (.*)$/
-            stack = [stack.first, sprintf('%s %s', stack.last.strip, $1)]
+            stack = [stack.first, "#{stack.last.strip} #{$1}"]
           elsif line =~ /^([A-Z][a-zA-Z-]+): (.*)$/
             subtag.flush_stack stack
             value = $2
